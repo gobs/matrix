@@ -17,12 +17,24 @@ func New[T any](w, h int, yztop bool) Matrix[T] {
 	return m
 }
 
-func (m Matrix[T]) Fix(y int) int {
-        if !m.yztop {
-            return m.h - 1 - y
-        }
+func (m Matrix[T]) Clone() Matrix[T] {
+	n := Matrix[T]{
+		w:     m.w,
+		h:     m.h,
+		yztop: m.yztop,
+		cells: make([]T, m.w*m.h),
+	}
 
-        return y
+	copy(n.cells, m.cells)
+	return n
+}
+
+func (m Matrix[T]) Fix(y int) int {
+	if !m.yztop {
+		return m.h - 1 - y
+	}
+
+	return y
 }
 
 func (m Matrix[T]) Width() int {
@@ -34,12 +46,12 @@ func (m Matrix[T]) Height() int {
 }
 
 func (m Matrix[T]) Get(x, y int) T {
-        y = m.Fix(y)
+	y = m.Fix(y)
 	return m.cells[y*m.w+x]
 }
 
 func (m Matrix[T]) Set(x, y int, v T) {
-        y = m.Fix(y)
+	y = m.Fix(y)
 	m.cells[y*m.w+x] = v
 }
 
