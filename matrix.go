@@ -17,6 +17,14 @@ func New[T any](w, h int, yztop bool) Matrix[T] {
 	return m
 }
 
+func (m Matrix[T]) Fix(y int) int {
+        if !m.yztop {
+            return m.h - 1 - y
+        }
+
+        return y
+}
+
 func (m Matrix[T]) Width() int {
 	return m.w
 }
@@ -26,27 +34,17 @@ func (m Matrix[T]) Height() int {
 }
 
 func (m Matrix[T]) Get(x, y int) T {
-	if !m.yztop {
-		y += m.h - 1
-	}
-
+        y = m.Fix(y)
 	return m.cells[y*m.w+x]
 }
 
 func (m Matrix[T]) Set(x, y int, v T) {
-	if !m.yztop {
-		y += m.h - 1
-	}
-
+        y = m.Fix(y)
 	m.cells[y*m.w+x] = v
 }
 
 func (m Matrix[T]) Row(y int) []T {
-	if !m.yztop {
-		y += m.h - 1
-	}
-
-	p := y * m.w
+	p := m.Fix(y) * m.w
 	return m.cells[p : p+m.w]
 }
 
