@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	m = New[string](10, 10, true)
+	m = New[string](10, 10, false)
 )
 
 func init() {
@@ -34,5 +34,18 @@ func TestByColumns(t *testing.T) {
 
 func TestClone(t *testing.T) {
 	m2 := m.Clone()
+	fmt.Printf("%#v\n", m2)
+}
+
+func TestFix(t *testing.T) {
+        fmt.Printf("fix 0: %v\n", m.Fix(0))
+        fmt.Printf("unfix 9: %v\n", m.Fix(9))
+}
+
+func TestFill(t *testing.T) {
+        m2 := m.Clone()
+	fmt.Printf("%#v\n", m2)
+
+        m2.Fill(".")
 	fmt.Printf("%#v\n", m2)
 }

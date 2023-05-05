@@ -29,6 +29,12 @@ func (m Matrix[T]) Clone() Matrix[T] {
 	return n
 }
 
+func (m Matrix[T]) Fill(v T) {
+        for i := range m.cells {
+            m.cells[i] = v
+        }
+}
+
 func (m Matrix[T]) Fix(y int) int {
 	if !m.yztop {
 		return m.h - 1 - y
