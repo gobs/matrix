@@ -1,76 +1,99 @@
 package matrix
 
+// A Matrix is a 2-dimensional table stored as a 1-dimensional slice
 type Matrix[T any] struct {
 	w, h  int  // width and height
-	yztop bool // y zero (true=top, false=bottom)
+	cart  bool // true: cartesian coordinates (0 at the bottom), false: computer coordinates (0 at the top)
 	cells []T  // array of cells
 }
 
+// A Cell stores the cell coordinates and its value
 type Cell[T any] struct {
 	X, Y  int
 	Value T
 }
 
-func New[T any](w, h int, yztop bool) Matrix[T] {
+// New creates a new Matrix given width, height and if it should use cartesian coordinates (0 at the bottom)
+func New[T any](w, h int, cart bool) Matrix[T] {
 	m := Matrix[T]{
 		w:     w,
 		h:     h,
-		yztop: yztop,
+		cart:  cart,
 		cells: make([]T, w*h),
 	}
 
 	return m
 }
 
-func (m Matrix[T]) Clone() Matrix[T] {
+// NewLike creates a new matrix with the same dimensions as the input matrix
+func NewLike[T any](m Matrix[T]) Matrix[T] {
 	n := Matrix[T]{
 		w:     m.w,
 		h:     m.h,
-		yztop: m.yztop,
+		cart:  m.cart,
 		cells: make([]T, m.w*m.h),
 	}
 
+	return n
+}
+
+// Clone creates a new matrix that is a copy of the input matrix
+func (m Matrix[T]) Clone() Matrix[T] {
+	n := NewLike(m)
 	copy(n.cells, m.cells)
 	return n
 }
 
+// Fill sets all cells of the matrix to the specified value
 func (m Matrix[T]) Fill(v T) {
 	for i := range m.cells {
 		m.cells[i] = v
 	}
 }
 
+// Fix converts the row number (y) from one coordinate system to the other (cartesian to computer or viceversa)
 func (m Matrix[T]) Fix(y int) int {
-	if !m.yztop {
+	if m.cart {
 		return m.h - 1 - y
 	}
 
 	return y
 }
 
+// Width returns the matrix width (number of columns)
 func (m Matrix[T]) Width() int {
 	return m.w
 }
 
+// Height returns the matrix height (number of rows)
 func (m Matrix[T]) Height() int {
 	return m.h
 }
 
+// Cartesian return true for cartesian coordinates (0 at the bottom) and false for computer coordinates (0 at the top)
+func (m Matrix[T]) Cartesian() bool {
+	return m.cart
+}
+
+// Get returns the value for the cell at x,y
 func (m Matrix[T]) Get(x, y int) T {
 	y = m.Fix(y)
 	return m.cells[y*m.w+x]
 }
 
+// Set changes the value for the cell at x,y
 func (m Matrix[T]) Set(x, y int, v T) {
 	y = m.Fix(y)
 	m.cells[y*m.w+x] = v
 }
 
+// Row returns the list of values for the specified row
 func (m Matrix[T]) Row(y int) []T {
 	p := m.Fix(y) * m.w
 	return m.cells[p : p+m.w]
 }
 
+// Column returns the list of values for the specified column
 func (m Matrix[T]) Col(x int) (col []T) {
 	for y := 0; y < m.h; y++ {
 		col = append(col, m.Get(x, y))
@@ -79,13 +102,21 @@ func (m Matrix[T]) Col(x int) (col []T) {
 	return col
 }
 
-func (m Matrix[T]) Adjacent(x, y int, roll bool) []Cell[T] {
+// Slice return the backing slice for the Matrix
+func (m Matrix[T]) Slice() []T {
+        return m.cells
+}
+
+// Adjacent returns a list of Cell(s) adjacent to the one at x,y.
+// If wrap is true coordinates that are outside the Matrix boundary will wrap around.
+// For example if x=0 return add rightmost cell, if y=top add bottom cell.
+func (m Matrix[T]) Adjacent(x, y int, wrap bool) []Cell[T] {
 	var cells []Cell[T]
 	var skipxl, skipxr, skipyd, skipyu bool
 
 	xl := x - 1
 	if xl < 0 {
-		if roll {
+		if wrap {
 			xl = m.w - 1
 		} else {
 			skipxl = true
@@ -94,7 +125,7 @@ func (m Matrix[T]) Adjacent(x, y int, roll bool) []Cell[T] {
 
 	xr := x + 1
 	if xr >= m.w {
-		if roll {
+		if wrap {
 			xr = 0
 		} else {
 			skipxr = true
@@ -103,7 +134,7 @@ func (m Matrix[T]) Adjacent(x, y int, roll bool) []Cell[T] {
 
 	yd := y - 1
 	if yd < 0 {
-		if roll {
+		if wrap {
 			yd = m.h - 1
 		} else {
 			skipyd = true
@@ -112,7 +143,7 @@ func (m Matrix[T]) Adjacent(x, y int, roll bool) []Cell[T] {
 
 	yu := y + 1
 	if yu >= m.h {
-		if roll {
+		if wrap {
 			yu = 0
 		} else {
 			skipyu = true

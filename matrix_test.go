@@ -29,7 +29,7 @@ var (
 		{X: 1, Y: 2},
 	}
 
-	left_r = []Cell[string]{
+	left_wrap = []Cell[string]{
 		{X: 0, Y: 0},
 		{X: 1, Y: 0},
 		{X: 1, Y: 1},
@@ -48,7 +48,7 @@ var (
 		{X: 2, Y: 0},
 	}
 
-	right_r = []Cell[string]{
+	right_wrap = []Cell[string]{
 		{X: 1, Y: 2},
 		{X: 2, Y: 2},
 		{X: 1, Y: 1},
@@ -71,7 +71,7 @@ var (
 		{X: 2, Y: 1},
 	}
 
-	bottomleft_r = []Cell[string]{
+	bottomleft_wrap = []Cell[string]{
 		{X: 0, Y: 1},
 		{X: 1, Y: 1},
 		{X: 1, Y: 0},
@@ -82,7 +82,7 @@ var (
 		{X: 1, Y: 2},
 	}
 
-	topright_r = []Cell[string]{
+	topright_wrap = []Cell[string]{
 		{X: 1, Y: 2},
 		{X: 1, Y: 1},
 		{X: 2, Y: 1},
@@ -215,26 +215,34 @@ func TestAdjacentRoll(t *testing.T) {
 	}
 
 	cells = m2.Adjacent(0, 1, true)
-	if !compare(cells, left_r) {
+	if !compare(cells, left_wrap) {
 		t.Logf("(0,1) %v %#v\n", len(cells), cells)
 		t.Fail()
 	}
 
 	cells = m2.Adjacent(2, 1, true)
-	if !compare(cells, right_r) {
+	if !compare(cells, right_wrap) {
 		t.Logf("(2,1) %v %#v\n", len(cells), cells)
 		t.Fail()
 	}
 
 	cells = m2.Adjacent(0, 0, true)
-	if !compare(cells, bottomleft_r) {
+	if !compare(cells, bottomleft_wrap) {
 		t.Logf("(0,0) %v %#v\n", len(cells), cells)
 		t.Fail()
 	}
 
 	cells = m2.Adjacent(2, 2, true)
-	if !compare(cells, topright_r) {
+	if !compare(cells, topright_wrap) {
 		t.Logf("(2,2) %v %#v\n", len(cells), cells)
+		t.Fail()
+	}
+}
+
+func TestNewLike(t *testing.T) {
+	n := NewLike(m)
+	if n.Width() != m.Width() || n.Height() != m.Height() {
+		t.Logf("expected %vx%v, got %vx%v", m.Width(), m.Height(), n.Width(), n.Height())
 		t.Fail()
 	}
 }
