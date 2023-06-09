@@ -92,6 +92,8 @@ var (
 		{X: 2, Y: 0},
 		{X: 1, Y: 0},
 	}
+
+	m4 Matrix[int]
 )
 
 func init() {
@@ -109,6 +111,13 @@ func init() {
 	m2.Set(2, 0, "TR")
 	m2.Set(2, 1, "MR")
 	m2.Set(2, 2, "BR")
+
+	m4, _ = FromSlice(4, false, []int{
+		0, 1, 2, 3,
+		4, 5, 6, 7,
+		8, 9, 10, 11,
+		12, 13, 14, 15,
+	})
 }
 
 func TestNew(t *testing.T) {
@@ -243,6 +252,32 @@ func TestNewLike(t *testing.T) {
 	n := NewLike(m)
 	if n.Width() != m.Width() || n.Height() != m.Height() {
 		t.Logf("expected %vx%v, got %vx%v", m.Width(), m.Height(), n.Width(), n.Height())
+		t.Fail()
+	}
+}
+
+func TestSubmatrix(t *testing.T) {
+	s := m4.Submatrix(1, 1, 2, 2)
+	r, _ := FromSlice(2, false, []int{5, 6, 9, 10})
+
+	if !s.Equals(r) {
+		t.Logf("expected %#v got %#v", r, s)
+		t.Fail()
+	}
+
+	s = m4.Submatrix(0, 0, 2, 2)
+	r, _ = FromSlice(2, false, []int{0, 1, 4, 5})
+
+	if !s.Equals(r) {
+		t.Logf("expected %#v got %#v", r, s)
+		t.Fail()
+	}
+
+	s = m4.Submatrix(2, 2, 3, 3)
+	r, _ = FromSlice(2, false, []int{10, 11, 14, 15})
+
+	if !s.Equals(r) {
+		t.Logf("expected %#v got %#v", r, s)
 		t.Fail()
 	}
 }
