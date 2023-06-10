@@ -257,8 +257,10 @@ func TestNewLike(t *testing.T) {
 }
 
 func TestSubmatrix(t *testing.T) {
+	cart := m4.Cartesian()
+
 	s := m4.Submatrix(1, 1, 2, 2)
-	r, _ := FromSlice(2, false, []int{5, 6, 9, 10})
+	r, _ := FromSlice(2, cart, []int{5, 6, 9, 10})
 
 	if !s.Equals(r) {
 		t.Logf("expected %#v got %#v", r, s)
@@ -266,7 +268,7 @@ func TestSubmatrix(t *testing.T) {
 	}
 
 	s = m4.Submatrix(0, 0, 2, 2)
-	r, _ = FromSlice(2, false, []int{0, 1, 4, 5})
+	r, _ = FromSlice(2, cart, []int{0, 1, 4, 5})
 
 	if !s.Equals(r) {
 		t.Logf("expected %#v got %#v", r, s)
@@ -274,10 +276,79 @@ func TestSubmatrix(t *testing.T) {
 	}
 
 	s = m4.Submatrix(2, 2, 3, 3)
-	r, _ = FromSlice(2, false, []int{10, 11, 14, 15})
+	r, _ = FromSlice(2, cart, []int{10, 11, 14, 15})
 
 	if !s.Equals(r) {
 		t.Logf("expected %#v got %#v", r, s)
+		t.Fail()
+	}
+}
+
+func TestCopy(t *testing.T) {
+	cart := m4.Cartesian()
+	src := m4.Submatrix(0, 0, 3, 3)
+	dst := New[int](5, 5, cart)
+
+	dst.Copy(0, 0, src)
+
+	r, _ := FromSlice(5, cart, []int{
+		0, 1, 2, 0, 0,
+		4, 5, 6, 0, 0,
+		8, 9, 10, 0, 0,
+		0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0,
+	})
+
+	if !dst.Equals(r) {
+		t.Logf("expected %#v got %#v", r, dst)
+		t.Fail()
+	}
+
+	dst.Fill(0)
+	dst.Copy(1, 1, src)
+
+	r, _ = FromSlice(5, cart, []int{
+		0, 0, 0, 0, 0,
+		0, 0, 1, 2, 0,
+		0, 4, 5, 6, 0,
+		0, 8, 9, 10, 0,
+		0, 0, 0, 0, 0,
+	})
+
+	if !dst.Equals(r) {
+		t.Logf("expected %#v got %#v", r, dst)
+		t.Fail()
+	}
+
+	dst.Fill(0)
+	dst.Copy(2, 2, src)
+
+	r, _ = FromSlice(5, cart, []int{
+		0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0,
+		0, 0, 0, 1, 2,
+		0, 0, 4, 5, 6,
+		0, 0, 8, 9, 10,
+	})
+
+	if !dst.Equals(r) {
+		t.Logf("expected %#v got %#v", r, dst)
+		t.Fail()
+	}
+
+	dst.Fill(0)
+	dst.Copy(3, 3, src)
+
+	r, _ = FromSlice(5, cart, []int{
+		0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0,
+		0, 0, 0, 0, 1,
+		0, 0, 0, 4, 5,
+	})
+
+	if !dst.Equals(r) {
+		t.Logf("expected %#v got %#v", r, dst)
 		t.Fail()
 	}
 }

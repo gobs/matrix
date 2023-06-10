@@ -57,6 +57,35 @@ func (m Matrix[T]) Clone() Matrix[T] {
 	return n
 }
 
+// Copy copies the matrix `n` into `m` starting at the coordinates `x,y`
+func (m Matrix[T]) Copy(x, y int, n Matrix[T]) {
+	if x >= m.w || y >= m.h {
+		return
+	}
+
+	if x < 0 {
+		x = 0
+	}
+	if y < 0 {
+		y = 0
+	}
+
+	w, h := n.w, n.h
+
+	if x+w > m.w {
+		w = m.w - x
+	}
+	if y+h > m.h {
+		h = m.h - y
+	}
+
+	for i := 0; i < h; i++ {
+		sr := n.Row(i)
+		dr := m.Row(y + i)
+		copy(dr[x:x+w], sr[:w])
+	}
+}
+
 // Creates a new matrix that is a subset of the input matrix
 func (m Matrix[T]) Submatrix(x, y, w, h int) Matrix[T] {
 	if x < 0 {
@@ -73,13 +102,10 @@ func (m Matrix[T]) Submatrix(x, y, w, h int) Matrix[T] {
 	}
 
 	s := New[T](w, h, m.cart)
-	p := 0
 
 	for i := 0; i < h; i++ {
-		r := m.Row(y)
-		copy(s.cells[p:p+w], r[x:x+w])
-		p += w
-		y++
+		sr := m.Row(y + i)
+		copy(s.Row(i), sr[x:x+w])
 	}
 
 	return s
