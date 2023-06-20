@@ -189,10 +189,24 @@ func (m Matrix[T]) Equals(n Matrix[T]) bool {
 	return true
 }
 
+type Neighbourhood int
+
+const (
+	MooreNeighbourhood Neighbourhood = iota
+	VonNewmannNeighbourhood
+	HexagonalNeighbourhood
+)
+
 // Adjacent returns a list of Cell(s) adjacent to the one at x,y.
 // If wrap is true coordinates that are outside the Matrix boundary will wrap around.
 // For example if x=0 return add rightmost cell, if y=top add bottom cell.
 func (m Matrix[T]) Adjacent(x, y int, wrap bool) []Cell[T] {
+	return m.Moore(x, y, wrap)
+}
+
+// Moore returns a list of Cell(s) adjacent to the one at x,y, according to the Moore neighbourhood
+// (from x-1, y-1 to x+1, y+1)
+func (m Matrix[T]) Moore(x, y int, wrap bool) []Cell[T] {
 	var cells []Cell[T]
 	var skipxl, skipxr, skipyd, skipyu bool
 
@@ -272,6 +286,150 @@ func (m Matrix[T]) Adjacent(x, y int, wrap bool) []Cell[T] {
 		if !skipyd {
 			cells = append(cells, Cell[T]{X: xr, Y: yd, Value: m.Get(xr, yd)})
 		}
+	}
+
+	return cells
+}
+
+// VonNewmann returns a list of Cell(s) adjacent to the one at x,y, according to the Von Newmann neighbourhood
+// (above, below, left, righ)
+func (m Matrix[T]) VonNewmann(x, y int, wrap bool) []Cell[T] {
+	var cells []Cell[T]
+	var skipxl, skipxr, skipyd, skipyu bool
+
+	xl := x - 1
+	if xl < 0 {
+		if wrap {
+			xl = m.w - 1
+		} else {
+			skipxl = true
+		}
+	}
+
+	xr := x + 1
+	if xr >= m.w {
+		if wrap {
+			xr = 0
+		} else {
+			skipxr = true
+		}
+	}
+
+	yd := y - 1
+	if yd < 0 {
+		if wrap {
+			yd = m.h - 1
+		} else {
+			skipyd = true
+		}
+	}
+
+	yu := y + 1
+	if yu >= m.h {
+		if wrap {
+			yu = 0
+		} else {
+			skipyu = true
+		}
+	}
+
+	// x-1
+	if !skipxl {
+		// x-1, y
+		cells = append(cells, Cell[T]{X: xl, Y: y, Value: m.Get(xl, y)})
+	}
+
+	// x, y+1
+	if !skipyu {
+		cells = append(cells, Cell[T]{X: x, Y: yu, Value: m.Get(x, yu)})
+	}
+
+	// x, y-1
+	if !skipyd {
+		cells = append(cells, Cell[T]{X: x, Y: yd, Value: m.Get(x, yd)})
+	}
+
+	// x+1
+	if !skipxr {
+		// x+1, y
+		cells = append(cells, Cell[T]{X: xr, Y: y, Value: m.Get(xr, y)})
+	}
+
+	return cells
+}
+
+// Hexagonal returns a list of Cell(s) adjacent to the one at x,y, according to the Hexagonal neighbourhood
+// (left, top-left, top, right, bottom-right, bottom)
+func (m Matrix[T]) Hexagonal(x, y int, wrap bool) []Cell[T] {
+	var cells []Cell[T]
+	var skipxl, skipxr, skipyd, skipyu bool
+
+	xl := x - 1
+	if xl < 0 {
+		if wrap {
+			xl = m.w - 1
+		} else {
+			skipxl = true
+		}
+	}
+
+	xr := x + 1
+	if xr >= m.w {
+		if wrap {
+			xr = 0
+		} else {
+			skipxr = true
+		}
+	}
+
+	yd := y - 1
+	if yd < 0 {
+		if wrap {
+			yd = m.h - 1
+		} else {
+			skipyd = true
+		}
+	}
+
+	yu := y + 1
+	if yu >= m.h {
+		if wrap {
+			yu = 0
+		} else {
+			skipyu = true
+		}
+	}
+
+	// x-1
+	if !skipxl {
+		// x-1, y
+		cells = append(cells, Cell[T]{X: xl, Y: y, Value: m.Get(xl, y)})
+
+		// x-1, y-1
+		if !skipyd {
+			cells = append(cells, Cell[T]{X: xl, Y: yd, Value: m.Get(xl, yd)})
+		}
+	}
+
+	// x, y+1
+	if !skipyu {
+		cells = append(cells, Cell[T]{X: x, Y: yu, Value: m.Get(x, yu)})
+	}
+
+	// x, y-1
+	if !skipyd {
+		cells = append(cells, Cell[T]{X: x, Y: yd, Value: m.Get(x, yd)})
+	}
+
+	// x+1
+	if !skipxr {
+		// x+1, y+1
+		if !skipyu {
+			cells = append(cells, Cell[T]{X: xr, Y: yu, Value: m.Get(xr, yu)})
+		}
+
+		// x+1, y
+		cells = append(cells, Cell[T]{X: xr, Y: y, Value: m.Get(xr, y)})
 	}
 
 	return cells
