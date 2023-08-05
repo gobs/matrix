@@ -161,7 +161,7 @@ func (m Matrix[T]) Row(y int) []T {
 }
 
 // Column returns the list of values for the specified column
-func (m Matrix[T]) Col(x int) (col []T) {
+func (m Matrix[T]) Column(x int) (col []T) {
 	for y := 0; y < m.h; y++ {
 		col = append(col, m.Get(x, y))
 	}
@@ -359,7 +359,7 @@ func (m Matrix[T]) VonNewmann(x, y int, wrap bool) []Cell[T] {
 }
 
 // Hexagonal returns a list of Cell(s) adjacent to the one at x,y, according to the Hexagonal neighbourhood
-// (left, top-left, top, right, bottom-right, bottom)
+// rules emulated on a rectangular grid (left, top-left, top, right, bottom-right, bottom)
 func (m Matrix[T]) Hexagonal(x, y int, wrap bool) []Cell[T] {
 	var cells []Cell[T]
 	var skipxl, skipxr, skipyd, skipyu bool
