@@ -132,7 +132,7 @@ func TestByRows(t *testing.T) {
 
 func TestByColumns(t *testing.T) {
 	for i := 0; i < m.Width(); i++ {
-		fmt.Println(m.Col(i))
+		fmt.Println(m.Column(i))
 	}
 }
 

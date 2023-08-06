@@ -154,6 +154,13 @@ func (m Matrix[T]) Set(x, y int, v T) {
 	m.cells[y*m.w+x] = v
 }
 
+// Swap changes the value for the cell at x,y with the one for the cell at x1, y1
+func (m Matrix[T]) Swap(x, y, x1, y1 int) {
+	p := m.Fix(y)*m.w + x
+	p1 := m.Fix(y1)*m.w + x1
+	m.cells[p], m.cells[p1] = m.cells[p1], m.cells[p]
+}
+
 // Row returns the list of values for the specified row
 func (m Matrix[T]) Row(y int) []T {
 	p := m.Fix(y) * m.w
