@@ -441,3 +441,28 @@ func (m Matrix[T]) Hexagonal(x, y int, wrap bool) []Cell[T] {
 
 	return cells
 }
+
+// Connected returns a list of Cell(s) connected to the one at x,y with the same value
+func (m Matrix[T]) Connected(x, y int, visited T) []Cell[T] {
+	v := m.Get(x, y)
+	b := m.Clone()
+	return b.connected(v, visited, x, y, nil)
+}
+
+func (m Matrix[T]) connected(v, visited T, x, y int, list []Cell[T]) []Cell[T] {
+	if x < 0 || x >= m.w || y < 0 || y >= m.h {
+		return list
+	}
+
+	if m.Get(x, y) != v {
+		return list
+	}
+
+	m.Set(x, y, visited)
+	list = append(list, Cell[T]{X: x, Y: y, Value: v})
+	list = m.connected(v, visited, x-1, y, list)
+	list = m.connected(v, visited, x+1, y, list)
+	list = m.connected(v, visited, x, y-1, list)
+	list = m.connected(v, visited, x, y+1, list)
+	return list
+}

@@ -352,3 +352,43 @@ func TestCopy(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestVisited(t *testing.T) {
+	m, _ := FromSlice(5, false, []int{
+		5, 0, 0, 0, 0,
+		5, 0, 0, 0, 0,
+		5, 5, 5, 0, 0,
+		0, 0, 5, 0, 0,
+		0, 0, 5, 0, 0,
+	})
+
+	l := m.Connected(0, 0, -1)
+	if len(l) != 7 {
+		t.Logf("expected connected=7, got %v", len(l))
+		t.Fail()
+	}
+
+	if l[0].Value != 5 {
+		t.Logf("expected value=5, got %v", l[0].Value)
+		t.Fail()
+	}
+
+	m, _ = FromSlice(5, true, []int{
+		5, 0, 0, 0, 0,
+		5, 0, 0, 0, 0,
+		5, 5, 5, 0, 0,
+		0, 0, 5, 0, 0,
+		0, 0, 5, 0, 0,
+	})
+
+	l = m.Connected(0, 0, -1)
+	if len(l) != 4 {
+		t.Logf("expected connected=7, got %v", len(l))
+		t.Fail()
+	}
+
+	if l[0].Value != 0 {
+		t.Logf("expected value=5, got %v", l[0].Value)
+		t.Fail()
+	}
+}
